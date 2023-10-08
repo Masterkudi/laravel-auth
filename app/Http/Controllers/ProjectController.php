@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class PostController extends Controller
+class ProjectController extends Controller
 {
     public function index() {
-        return view("guest.posts.index");
+        return view("guest.projects.index");
     }
 }

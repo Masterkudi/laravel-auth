@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\PostController as GuestPostController;
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\ProjectController as GuestProjectController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,22 +32,22 @@ Route::middleware(['auth', 'verified'])
     ->group(function () {
 
         // CREATE
-        Route::get("/posts/create", [PostController::class, "create"])->name("posts.create");
-        Route::post("/posts", [PostController::class, "store"])->name("posts.store");
+        Route::get("/projects/create", [ProjectController::class, "create"])->name("projects.create");
+        Route::post("/projects", [ProjectController::class, "store"])->name("projects.store");
 
         // READ
-        Route::get("/posts", [PostController::class, "index"])->name("posts.index");
-        Route::get("/posts/{post}", [PostController::class, "show"])->name("posts.show");
+        Route::get("/projects", [ProjectController::class, "index"])->name("projects.index");
+        Route::get("/projects/{project}", [ProjectController::class, "show"])->name("projects.show");
 
         // UPDATE
-        Route::get("/posts/{id}/edit", [PostController::class, "edit"])->name("posts.edit");
-        Route::put("/posts/{id}", [PostController::class, "update"])->name("posts.update");
+        Route::get("/projects/{id}/edit", [ProjectController::class, "edit"])->name("projects.edit");
+        Route::put("/projects/{id}", [ProjectController::class, "update"])->name("projects.update");
 
         // DESTROY
-        Route::delete("/posts/{id}", [PostController::class, "destroy"])->name("posts.destroy");
+        Route::delete("/projects/{id}", [ProjectController::class, "destroy"])->name("projects.destroy");
     });
 
-    Route::get("/posts", [GuestPostController::class, "index"])->name("posts.index");
+    Route::get("/projects", [GuestProjectController::class, "index"])->name("projects.index");
 
 // AUTHENTICATION ROUTES
 

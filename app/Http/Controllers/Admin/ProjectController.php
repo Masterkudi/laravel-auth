@@ -1,34 +1,34 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Models\Post;
+use App\Models\Project;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class PostController extends Controller
-{
-    public function index() {
-        $posts = Post::all();
 
-        return view('admin.posts.index', compact('posts'));
+    class ProjectController extends Controller {
+    public function index() {
+        $projects = Project::all();
+
+        return view('admin.projects.index', compact('projects'));
     }
 
     // SHOW FUNCTION
 
     public function show($slug) {
-        $post = Post::where('slug', $slug)->first();
+        $project = Project::where('slug', $slug)->first();
 
-        return view('admin.posts.show', compact('post'));
+        return view('admin.projects.show', compact('project'));
     }
 
     // CREATE FUNCTION
 
     public function create() {
-        return view('admin.posts.create');
+        return view('admin.projects.create');
     }
 
     // STORE FUNCTION CON FUNZIONE SLUG
@@ -51,7 +51,7 @@ class PostController extends Controller
 
             // cerco se esiste già un elemento con questo slug
 
-            $alreadyExists = Post::where("slug", $slug)->first();
+            $alreadyExists = Project::where("slug", $slug)->first();
 
             $counter++;
 
@@ -59,31 +59,31 @@ class PostController extends Controller
 
         $data["slug"] = $slug;
 
-        // $post = new Post();
-        // $post->fill($data);
-        // $post->save()
+        // $project = new Project();
+        // $project->fill($data);
+        // $project->save()
 
-        // semplifico il procedimento usando il Post::create invece di newPost(), fill() e save()
+        // semplifico il procedimento usando il Project::create invece di newProject(), fill() e save()
         // eseguendoli in un unico comando
 
-        $post = Post::create($data);
+        $project = Project::create($data);
 
-        return redirect()->route('admin.posts.show', $post->id);//->with('success', 'Post created succeffully.')
+        return redirect()->route('admin.projects.show', $project->id);//->with('success', 'Project created succeffully.')
     }
 
     // EDIT FUNCTION
 
     public function edit($id)
     {
-        $posts = Post::findOrFail($id);
+        $projects = Project::findOrFail($id);
 
-        return view("posts.edit", ["posts" => $posts]);
+        return view("projects.edit", ["projects" => $projects]);
     }
 
     // UPDATE FUNCTION
 
         /**
-     * Riceve i dati inviati dal form edit e aggiorna il post che corrisponde
+     * Riceve i dati inviati dal form edit e aggiorna il progetto che corrisponde
      * all'id indicato come argomento
      * 
      * @return Request $request
@@ -93,7 +93,7 @@ class PostController extends Controller
     public function update(Request $request, int $id): RedirectResponse
     {
         // recupera il gioco che corrisponde all'id ricevuto come argomento
-        $post = Post::findOrFail($id);
+        $project = Project::findOrFail($id);
 
         // legge i dati ricevuti dal form
         $newData = $request->all();
@@ -101,12 +101,12 @@ class PostController extends Controller
         // $newData["genre"] = explode(",", $newData["genre"]);
         // $newData["platform"] = explode(",", $newData["platform"]);
 
-        // aggiorna i dati del gioco tramite
+        // aggiorna i dati del progetto tramite
         // esegue 2 azioni dietro le quinte: fill() e save()
-        $post->update($newData);
+        $project->update($newData);
 
         // Esegue il redirect alla rotta scelta (in questo caso la pagina prodotto)
-        return redirect()->route("posts.show", $post->id);
+        return redirect()->route("projects.show", $project->id);
     }
 
     // DELETE FUNCTION
@@ -120,14 +120,16 @@ class PostController extends Controller
      */
     public function destroy(int $id): RedirectResponse {
         // recupera il post che corrisponde all'id ricevuto come argomento
-        $post = Post::findOrFail($id);
+        $project = Project::findOrFail($id);
 
         // elimina il post
-        $post->delete();
+        $project->delete();
 
         // Esegue il redirect alla rotta scelta (in questo caso la pagina principale)
-        return redirect()->route("posts.index");
+        return redirect()->route("projects.index");
     }
 
 }
+
+
 

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProjectUpsertRequest;
 use App\Models\Project;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -31,102 +30,88 @@ use Illuminate\Support\Str;
         return view('admin.projects.create');
     }
 
-    // STORE FUNCTION CON FUNZIONE SLUG
+// STORE FUNCTION CON FUNZIONE SLUG
 
-    public function store(Request $request) {
-        $data = $request->validate([
-            'title' => 'required|max:255',
-            'body' => 'required',
-            'image' => 'required|max:255',
-        ]);
+    public function store(ProjectUpsertRequest $request) {
+        $data = $request->validated(); // questa funzione ritorna i dati già validati da Laravel
 
-        // contatore da usare per avere un numero incrementale
-
-        $counter = 0;
-
-        do {
-            // creo uno slug e se il counter è maggiore di 0, concateno il counter
-
-            $slug = Str::slug($data["title"]) . ($counter > 0 ? "-" . $counter : "");
-
-            // cerco se esiste già un elemento con questo slug
-
-            $alreadyExists = Project::where("slug", $slug)->first();
-
-            $counter++;
-
-        } while ($alreadyExists); // finché esiste già un elemento con questo slug, ripeto il ciclo per creare uno slug nuovo
-
-        $data["slug"] = $slug;
+        // qui invoco la funzione generateSlug tramite il $this e gli passo il titolo dell'articolo per ppoter generare lo slug        
+        $data["slug"] = $this->generateSlug($data['title']);
 
         // $project = new Project();
         // $project->fill($data);
         // $project->save()
 
-        // semplifico il procedimento usando il Project::create invece di newProject(), fill() e save()
-        // eseguendoli in un unico comando
+        // semplifico il procedimento usando il Project::create invece di newProject(), fill() e save() eseguendoli in un unico comando
 
         $project = Project::create($data);
 
-        return redirect()->route('admin.projects.show', $project->id);//->with('success', 'Project created succeffully.')
+        return redirect()->route('admin.projects.show', $project->slug);//->with('success', 'Project created succeffully.')
     }
 
-    // EDIT FUNCTION
+// EDIT FUNCTION
 
-    public function edit($id)
-    {
-        $projects = Project::findOrFail($id);
+    public function edit($slug) { // la funzione edit recupera il progetto corrente, richiesto con lo slug e lo passa con la variabile 'project' alla view .edit
+        $project = Project::where('slug', $slug)->firstOrFail();
 
-        return view("projects.edit", ["projects" => $projects]);
+        return view('admin.projects.edit', compact('project'));
     }
 
-    // UPDATE FUNCTION
+// UPDATE FUNCTION
 
-        /**
-     * Riceve i dati inviati dal form edit e aggiorna il progetto che corrisponde
-     * all'id indicato come argomento
-     * 
-     * @return Request $request
-     * @param int $id ID del post da modificare
-     * @return RedirectResponse 
-     */
-    public function update(Request $request, int $id): RedirectResponse
-    {
-        // recupera il gioco che corrisponde all'id ricevuto come argomento
-        $project = Project::findOrFail($id);
+    public function update(ProjectUpsertRequest $request, $slug) {
+        $data = $request->validated();
+        $project = Project::where("slug", $slug)->firstOrFail();
 
-        // legge i dati ricevuti dal form
-        $newData = $request->all();
+        // se il titolo è cambiato, rigenero lo slug
+        if ($data['title'] !== $project->title) {
+            $data["slug"] = $this->generateSlug($data['title']);
+        } 
 
-        // $newData["genre"] = explode(",", $newData["genre"]);
-        // $newData["platform"] = explode(",", $newData["platform"]);
+        // $project->update($data); // la funzione update aggiorna i dati e modifica il db
 
-        // aggiorna i dati del progetto tramite
-        // esegue 2 azioni dietro le quinte: fill() e save()
-        $project->update($newData);
+        // se spunto la checkbox, il server riceve il valore true
+        // se non la spunto, il server riceve il valore false
+        if (isset($data["is_published"])) {
+            $project->is_published = true;
+            $project->published_at = now();
+        } else {
+            $project->is_published = false;
+            $project->published_at = null;
+        }
+        
+        $project->update($data);
 
-        // Esegue il redirect alla rotta scelta (in questo caso la pagina prodotto)
-        return redirect()->route("projects.show", $project->id);
+        return redirect()->route('admin.projects.show', $project->slug);
     }
 
-    // DELETE FUNCTION
+// DELETE FUNCTION
 
+    public function destroy($slug) {
+        $project = Project::where("slug", $slug)->firstOrFail();
 
-    /**
-     * Rimuove il post che corrisponde ricevuto come argomento
-     * 
-     * @param int $id ID del post da eliminare
-     * @return RedirectResponse
-     */
-    public function destroy(int $id): RedirectResponse {
-        // recupera il post che corrisponde all'id ricevuto come argomento
-        $project = Project::findOrFail($id);
-
-        // elimina il post
         $project->delete();
 
-        // Esegue il redirect alla rotta scelta (in questo caso la pagina principale)
-        return redirect()->route("projects.index");
+        return redirect()->route("admin.projects.index");
+    } 
+    
+// GENERATE SLUG FUNCTION    
+
+    protected function generateSlug($title) {
+        // contatore da usare per avere un numero incrementale
+        $counter = 0;
+
+        do {
+            // creo uno slug e se il counter è maggiore di 0, concateno il counter
+            $slug = Str::slug($title) . ($counter > 0 ? "-" . $counter : "");
+
+            // cerco se esiste già un elemento con questo slug
+            $alreadyExists = Project::where("slug", $slug)->first();
+
+            $counter++;
+        } while ($alreadyExists); // finché esiste già un elemento con questo slug, ripeto il ciclo per creare uno slug nuovo
+
+        return $slug;
     }
 
 }

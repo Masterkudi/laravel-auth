@@ -40,9 +40,9 @@ Route::middleware(['auth', 'verified'])
         Route::get("/projects/{project}", [ProjectController::class, "show"])->name("projects.show");
 
         // UPDATE
-        Route::get("/projects/{id}/edit", [ProjectController::class, "edit"])->name("projects.edit");
-        Route::put("/projects/{id}", [ProjectController::class, "update"])->name("projects.update");
-
+        Route::get("/projects/{project}/edit", [ProjectController::class, "edit"])->name("projects.edit"); // mostra il form dover poter modifcare il contenuto
+        Route::put("/projects/{project}", [ProjectController::class, "update"])->name("projects.update"); // aggiorna l'elemento con quel id in base ai dati che gli stiamo inviando
+        
         // DESTROY
         Route::delete("/projects/{id}", [ProjectController::class, "destroy"])->name("projects.destroy");
     });

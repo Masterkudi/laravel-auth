@@ -16,7 +16,7 @@ class ProjectUpsertRequest extends FormRequest
         $user = Auth::user();
 
         // se l'email è cudini.andrea@gmail.com lo faccio passare, altrimenti no.
-        if($user->email === "cudini.andrea@gmail.com") {
+        if ($user->email === "cudini.andrea@gmail.com") {
             // se ritorno true l'operazione viene permessa
             return true;
         }
@@ -35,23 +35,24 @@ class ProjectUpsertRequest extends FormRequest
         return [
             'title' => 'required|max:255',
             'body' => 'required',
-            'image' => 'required|max:255',
+            'image' => 'required|image|max:5120',
             'is_published' => 'nullable|boolean'
         ];
     }
 
-     /**
+    /**
      * tra "" posso scrivere i messaggi di errore che appaiono in caso di non iserimento delle regole di validazione obbligatorie.
      *
      * @return array<string, string>
      */
-    public function messages(): array {
+    public function messages(): array
+    {
         return [
             // per esempio
-            'title.required' => "title is required", 
+            'title.required' => "title is required",
             'title.max' => "Title is too long", // messaggio di errore se il titolo è troppo lungo
-            'body.required' => "body is required", 
-            'image.required' => "image is required", 
+            'body.required' => "body is required",
+            'image.required' => "image is required",
             'image.max' => "",
         ];
     }

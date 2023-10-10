@@ -42,12 +42,12 @@ Route::middleware(['auth', 'verified'])
         // UPDATE
         Route::get("/projects/{project}/edit", [ProjectController::class, "edit"])->name("projects.edit"); // mostra il form dover poter modifcare il contenuto
         Route::put("/projects/{project}", [ProjectController::class, "update"])->name("projects.update"); // aggiorna l'elemento con quel id in base ai dati che gli stiamo inviando
-        
+
         // DESTROY
         Route::delete("/projects/{id}", [ProjectController::class, "destroy"])->name("projects.destroy");
     });
 
-    Route::get("/projects", [GuestProjectController::class, "index"])->name("projects.index");
+Route::get("/projects", [GuestProjectController::class, "index"])->name("projects.index");
 
 // AUTHENTICATION ROUTES
 

@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProjectUpsertRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\Uid\Uuid;
 
 
-    class ProjectController extends Controller {
-    public function index() {
+class ProjectController extends Controller
+{
+    public function index()
+    {
         $projects = Project::all();
 
         return view('admin.projects.index', compact('projects'));
@@ -18,7 +23,8 @@ use Illuminate\Support\Str;
 
     // SHOW FUNCTION
 
-    public function show($slug) {
+    public function show($slug)
+    {
         $project = Project::where('slug', $slug)->first();
 
         return view('admin.projects.show', compact('project'));
@@ -26,13 +32,15 @@ use Illuminate\Support\Str;
 
     // CREATE FUNCTION
 
-    public function create() {
+    public function create()
+    {
         return view('admin.projects.create');
     }
 
-// STORE FUNCTION CON FUNZIONE SLUG
+    // STORE FUNCTION CON FUNZIONE SLUG
 
-    public function store(ProjectUpsertRequest $request) {
+    public function store(ProjectUpsertRequest $request)
+    {
         $data = $request->validated(); // questa funzione ritorna i dati già validati da Laravel
 
         // qui invoco la funzione generateSlug tramite il $this e gli passo il titolo dell'articolo per ppoter generare lo slug        
@@ -42,31 +50,35 @@ use Illuminate\Support\Str;
         // $project->fill($data);
         // $project->save()
 
-        // semplifico il procedimento usando il Project::create invece di newProject(), fill() e save() eseguendoli in un unico comando
+        // identifico il percorso della cartella in cui la rotta andrà a salvare l'immagine
+        $data['image'] = Storage::put('projects', $data['image']);
 
+        // semplifico il procedimento usando il Project::create invece di newProject(), fill() e save() eseguendoli in un unico comando
         $project = Project::create($data);
 
-        return redirect()->route('admin.projects.show', $project->slug);//->with('success', 'Project created succeffully.')
+        return redirect()->route('admin.projects.show', $project->slug); //->with('success', 'Project created succeffully.')
     }
 
-// EDIT FUNCTION
+    // EDIT FUNCTION
 
-    public function edit($slug) { // la funzione edit recupera il progetto corrente, richiesto con lo slug e lo passa con la variabile 'project' alla view .edit
+    public function edit($slug)
+    { // la funzione edit recupera il progetto corrente, richiesto con lo slug e lo passa con la variabile 'project' alla view .edit
         $project = Project::where('slug', $slug)->firstOrFail();
 
         return view('admin.projects.edit', compact('project'));
     }
 
-// UPDATE FUNCTION
+    // UPDATE FUNCTION
 
-    public function update(ProjectUpsertRequest $request, $slug) {
+    public function update(ProjectUpsertRequest $request, $slug)
+    {
         $data = $request->validated();
         $project = Project::where("slug", $slug)->firstOrFail();
 
         // se il titolo è cambiato, rigenero lo slug
         if ($data['title'] !== $project->title) {
             $data["slug"] = $this->generateSlug($data['title']);
-        } 
+        }
 
         // $project->update($data); // la funzione update aggiorna i dati e modifica il db
 
@@ -79,25 +91,38 @@ use Illuminate\Support\Str;
             $project->is_published = false;
             $project->published_at = null;
         }
-        
+
+        if (isset($data['image'])) {
+            // questa funzione cancella l'immagine vecchia dalla cartella storage
+            if ($project->image) {
+                Storage::delete($project->iamge);
+            }
+            // identifico il percorso della cartella in cui la rotta andrà a salvare l'immagine
+            $image_path = Storage::put('projects', $data['image']);
+
+            $data['image'] = $image_path;
+        }
+
         $project->update($data);
 
         return redirect()->route('admin.projects.show', $project->slug);
     }
 
-// DELETE FUNCTION
+    // DELETE FUNCTION
 
-    public function destroy($slug) {
+    public function destroy($slug)
+    {
         $project = Project::where("slug", $slug)->firstOrFail();
 
         $project->delete();
 
         return redirect()->route("admin.projects.index");
-    } 
-    
-// GENERATE SLUG FUNCTION    
+    }
 
-    protected function generateSlug($title) {
+    // GENERATE SLUG FUNCTION    
+
+    protected function generateSlug($title)
+    {
         // contatore da usare per avere un numero incrementale
         $counter = 0;
 
@@ -113,8 +138,4 @@ use Illuminate\Support\Str;
 
         return $slug;
     }
-
 }
-
-
-

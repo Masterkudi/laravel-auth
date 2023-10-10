@@ -23,19 +23,18 @@
                 @foreach ($projects as $project)
                     <tr>
                         <td>{{ $project->title }}</td>
-                        <td>{{ $project->image }}</td>
+                        <td><img src={{ asset('/storage/' . $project->image) }} class="img-thumbnail" style="width: 70px" ></td>
                         <td>{{ $project->published_at?->format('d/m/Y H:i') }}</td>
                         <td>
-                            <a href="{{ route('admin.projects.show', $project->slug) }}" class="btn btn-info">Details</a>
-                            <a href="{{ route('admin.projects.edit', $project->slug) }}" class="btn btn-warning">Update</a>
+                            <a href="{{ route('admin.projects.show', $project->slug) }}" class="btn btn-info"><i class="fa-solid fa-circle-info"></i></a>
+                            <a href="{{ route('admin.projects.edit', $project->slug) }}" class="btn btn-warning"><i class="fa-solid fa-pen-to-square"></i></a>
 
-                          {{-- form per il delete --}}
-                          <form action="{{ route('admin.projects.destroy', $project->slug)}}" method="POST">
-                            @csrf()
-                            @method('DELETE')
-
-                          <button class="btn btn-danger">Elimina</button>
-                          </form>
+                            {{-- form per il delete --}}
+                            <form action="{{ route('admin.projects.destroy', $project->slug) }}" method="POST">
+                                @csrf()
+                                @method('DELETE')
+                                <button class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

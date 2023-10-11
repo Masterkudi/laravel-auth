@@ -17,7 +17,7 @@
         @endif
 
         {{-- $project rappresenta i dati recuperarti con il controller --}}
-        <form action="{{ route('admin.projects.update', $project->slug) }}" method="POST" enctype="multipart/form-data ">
+        <form action="{{ route('admin.projects.update', $project->slug) }}" method="POST" enctype="multipart/form-data">
             @csrf()
             @method('PUT')
 
@@ -28,7 +28,7 @@
 
             <div class="mb-3">
                 <label class="form-label" for="image_input">Immagine</label>
-                <input type="file"class="form-control" name="image" id="image_input" accept="image/*">
+                <input type="file" class="form-control" name="image" id="image_input" accept="image/*">
             </div>
 
             <div class="mb-3">
@@ -38,7 +38,8 @@
 
             <div class="mb-3">
                 <label class="form-label">Data Pubblicazione</label>
-                <input type="date" class="form-control" name="published_at" value="{{ $project->published_at?->toDateString() }}">
+                <input type="date" class="form-control" name="published_at"
+                    value="{{ $project->published_at?->toDateString() }}">
             </div>
 
             <div class="mb-3">

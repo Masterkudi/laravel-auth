@@ -73,6 +73,7 @@ class ProjectController extends Controller
     public function update(ProjectUpsertRequest $request, $slug)
     {
         $data = $request->validated();
+
         $project = Project::where("slug", $slug)->firstOrFail();
 
         // se il titolo è cambiato, rigenero lo slug
@@ -95,7 +96,7 @@ class ProjectController extends Controller
         if (isset($data['image'])) {
             // questa funzione cancella l'immagine vecchia dalla cartella storage
             if ($project->image) {
-                Storage::delete($project->iamge);
+                Storage::delete($project->image);
             }
             // identifico il percorso della cartella in cui la rotta andrà a salvare l'immagine
             $image_path = Storage::put('projects', $data['image']);

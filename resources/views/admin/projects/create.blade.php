@@ -27,8 +27,14 @@
                 <input type="file" accept="image/*" class="form-control"name="image">
             </div>
 
-            <div class="mb-3"><label class="form-label">Contenuto</label>
+            <div class="mb-3">
+                <label class="form-label">Contenuto</label>
                 <textarea class="form-control" name="body"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Data Pubblicazione</label>
+                <input type="date" class="form-control" name="published_at">
             </div>
 
             <button class="btn btn-primary">Salva</button>
